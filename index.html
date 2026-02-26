@@ -1,38 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Rule Engine Test</title>
-</head>
-<body>
-
-  <h2>Simple Rule Engine</h2>
-
-  <input type="text" id="inputBox" placeholder="Type something...">
-  <button onclick="processInput()">Run</button>
-
-  <p id="output"></p>
-
-  <script>
-    function processInput() {
-      let input = document.getElementById("inputBox").value;
-      let output = "";
-
-     
-      if (input.includes("+")) {
-        output = "That looks like math. beacsue it contains "+" ";
-      }
-      else {
-        output = "No rule matched.";
-      }
-      if input.inculdes("no") {
-
-        output = "im sorry for doing that"
-      }
-          
-
-      document.getElementById("output").innerText = output;
+<script>
+  // Pre-built helper functions
+  const helpers = {
+    contains: (text, word) => text.includes(word),
+    startsWith: (text, word) => text.startsWith(word),
+    endsWith: (text, word) => text.endsWith(word),
+    addNumbers: (text) => {
+      const match = text.match(/(\d+)\s*\+\s*(\d+)/);
+      if (!match) return null;
+      return Number(match[1]) + Number(match[2]);
     }
-  </script>
+  };
 
-</body>
-</html>
+  // Rule list (easy to add more)
+  const rules = [
+    {
+      match: (input) => helpers.contains(input, "no"),
+      action: () => "I'm sorry for doing that."
+    },
+    {
+      match: (input) => helpers.contains(input, "+"),
+      action: (input) => {
+        const result = helpers.addNumbers(input);
+        if (result !== null) {
+          return "Math result: " + result;
+        }
+        return "That looks like math but I can't calculate it.";
+      }
+    }
+  ];
+
+  function processInput() {
+    const input = document.getElementById("inputBox").value;
+    let output = "No rule matched.";
+
+    for (const rule of rules) {
+      if (rule.match(input)) {
+        output = rule.action(input);
+        break;
+      }
+    }
+
+    document.getElementById("output").innerText = output;
+  }
+</script>
