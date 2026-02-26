@@ -63,6 +63,9 @@ const engine = new RuleEngine();
 // Rules
 engine.addStraight("hello", "Hi there!");
 engine.addStraight("bye", "Goodbye!");
+engine.addStraight("no", "sorry about that");
+engine.addStraight("your dumb", "yes i am duh");
+engine.addStraight("whats your name", "idk");
 
 engine.addCoded(
   (input) => input.includes("+"),
@@ -71,6 +74,13 @@ engine.addCoded(
     if (!match) return "That looks like math.";
     return "Math result: " + (Number(match[1]) + Number(match[2]));
   }
+);
+engine.addCoded(
+  // Match function: when to trigger
+  (input) => input.includes("random number"),
+  
+  // Action function: what to do
+  () => Math.random()
 );
 
 // =======================
@@ -87,7 +97,7 @@ engine.addModifier((output, input) => {
 
 // Add emoji modifier
 engine.addModifier((output, input) => {
-  if (input.includes("happy")) {
+  if (input.includes("with happy emoji")) {
     return output + " 😊";
   }
   return output;
