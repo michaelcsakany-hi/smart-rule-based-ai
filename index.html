@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rule Engine Test</title>
+</head>
+<body>
+
+  <h2>Simple Rule Engine</h2>
+
+  <input type="text" id="inputBox" placeholder="Type something...">
+  <button onclick="processInput()">Run</button>
+
+  <p id="output"></p>
+
+  <script>
+    function processInput() {
+      let input = document.getElementById("inputBox").value;
+      let output = "";
+
+     
+      if (input.includes("+")) {
+        output = "That looks like math. beacsue it contains "+" ";
+      }
+      else {
+        output = "No rule matched.";
+      }
+      if input.inculdes("no") {
+
+        output = "im sorry for doing that"
+      }
+          
+
+      document.getElementById("output").innerText = output;
+    }
+  </script>
+
+</body>
+</html>
