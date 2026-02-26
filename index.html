@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Modular Rule Engine</title>
-</head>
-<body>
-
-<h2>Rule Engine</h2>
-
-<input type="text" id="inputBox" placeholder="Type something...">
-<button id="runBtn">Run</button>
-
-<p id="output"></p>
-
 <script>
-/* =========================
-   ENGINE CORE (Do Not Touch)
-========================= */
 
 class RuleEngine {
   constructor() {
     this.straightRules = [];
     this.codedRules = [];
+    this.modifiers = [];
   }
 
   addStraight(trigger, response) {
@@ -31,44 +15,55 @@ class RuleEngine {
     this.codedRules.push({ match: matchFunction, action: actionFunction });
   }
 
+  addModifier(modifierFunction) {
+    this.modifiers.push(modifierFunction);
+  }
+
   process(input) {
     input = input.toLowerCase();
+    let output = null;
 
-    // 1️⃣ Straight rules
+    // Straight rules
     for (const rule of this.straightRules) {
       if (input.includes(rule.trigger.toLowerCase())) {
-        return rule.response;
+        output = rule.response;
+        break;
       }
     }
 
-    // 2️⃣ Coded rules
-    for (const rule of this.codedRules) {
-      if (rule.match(input)) {
-        return rule.action(input);
+    // Coded rules
+    if (!output) {
+      for (const rule of this.codedRules) {
+        if (rule.match(input)) {
+          output = rule.action(input);
+          break;
+        }
       }
     }
 
-    return "No rule matched.";
+    if (!output) {
+      output = "No rule matched.";
+    }
+
+    // Apply modifiers
+    for (const modifier of this.modifiers) {
+      output = modifier(output, input);
+    }
+
+    return output;
   }
 }
 
-/* =========================
-   CREATE ENGINE INSTANCE
-========================= */
+// =======================
+// Create Engine
+// =======================
 
 const engine = new RuleEngine();
 
-/* =========================
-   ADD RULES HERE ONLY
-   (Safe to edit this section)
-========================= */
-
-// Straight rules (super easy)
+// Rules
 engine.addStraight("hello", "Hi there!");
 engine.addStraight("bye", "Goodbye!");
-engine.addStraight("no", "I'm sorry about that.");
 
-// Coded rules (advanced logic)
 engine.addCoded(
   (input) => input.includes("+"),
   (input) => {
@@ -78,21 +73,34 @@ engine.addCoded(
   }
 );
 
-engine.addCoded(
-  (input) => input.startsWith("what is"),
-  () => "That sounds like a question."
-);
+// =======================
+// Modifiers
+// =======================
 
-/* =========================
-   CONNECT TO UI
-========================= */
+// Uppercase modifier
+engine.addModifier((output, input) => {
+  if (input.includes("shout")) {
+    return output.toUpperCase();
+  }
+  return output;
+});
+
+// Add emoji modifier
+engine.addModifier((output, input) => {
+  if (input.includes("happy")) {
+    return output + " 😊";
+  }
+  return output;
+});
+
+// =======================
+// UI Hook
+// =======================
 
 document.getElementById("runBtn").addEventListener("click", () => {
   const input = document.getElementById("inputBox").value;
   const result = engine.process(input);
   document.getElementById("output").innerText = result;
 });
-</script>
 
-</body>
-</html>
+</script>
