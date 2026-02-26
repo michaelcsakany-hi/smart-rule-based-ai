@@ -60,7 +60,7 @@ class RuleEngine {
       output = "No rule matched.";
     }
 
-    // Apply modifiers
+    // Modifiers
     for (const modifier of this.modifiers) {
       output = modifier(output, input);
     }
@@ -68,10 +68,6 @@ class RuleEngine {
     return output;
   }
 }
-
-// =======================
-// Create Engine
-// =======================
 
 const engine = new RuleEngine();
 
@@ -82,6 +78,7 @@ engine.addStraight("no", "sorry about that");
 engine.addStraight("your dumb", "yes i am duh");
 engine.addStraight("whats your name", "idk");
 
+// Math rule
 engine.addCoded(
   (input) => input.includes("+"),
   (input) => {
@@ -90,19 +87,14 @@ engine.addCoded(
     return "Math result: " + (Number(match[1]) + Number(match[2]));
   }
 );
+
+// Random rule
 engine.addCoded(
-  // Match function: when to trigger
   (input) => input.includes("random number"),
-  
-  // Action function: what to do
   () => Math.random()
 );
 
-// =======================
 // Modifiers
-// =======================
-
-// Uppercase modifier
 engine.addModifier((output, input) => {
   if (input.includes("shout")) {
     return output.toUpperCase();
@@ -110,7 +102,6 @@ engine.addModifier((output, input) => {
   return output;
 });
 
-// Add emoji modifier
 engine.addModifier((output, input) => {
   if (input.includes("with happy emoji")) {
     return output + " 😊";
@@ -118,10 +109,7 @@ engine.addModifier((output, input) => {
   return output;
 });
 
-// =======================
-// UI Hook
-// =======================
-
+// Button hookup
 document.getElementById("runBtn").addEventListener("click", () => {
   const input = document.getElementById("inputBox").value;
   const result = engine.process(input);
@@ -129,3 +117,6 @@ document.getElementById("runBtn").addEventListener("click", () => {
 });
 
 </script>
+
+</body>
+</html>
