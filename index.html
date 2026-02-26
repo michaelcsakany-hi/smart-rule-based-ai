@@ -1,45 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Modular Rule Engine</title>
+</head>
+<body>
+
+<h2>Rule Engine</h2>
+
+<input type="text" id="inputBox" placeholder="Type something...">
+<button id="runBtn">Run</button>
+
+<p id="output"></p>
+
 <script>
-  // Pre-built helper functions
-  const helpers = {
-    contains: (text, word) => text.includes(word),
-    startsWith: (text, word) => text.startsWith(word),
-    endsWith: (text, word) => text.endsWith(word),
-    addNumbers: (text) => {
-      const match = text.match(/(\d+)\s*\+\s*(\d+)/);
-      if (!match) return null;
-      return Number(match[1]) + Number(match[2]);
-    }
-  };
+/* =========================
+   ENGINE CORE (Do Not Touch)
+========================= */
 
-  // Rule list (easy to add more)
-  const rules = [
-    {
-      match: (input) => helpers.contains(input, "no"),
-      action: () => "I'm sorry for doing that."
-    },
-    {
-      match: (input) => helpers.contains(input, "+"),
-      action: (input) => {
-        const result = helpers.addNumbers(input);
-        if (result !== null) {
-          return "Math result: " + result;
-        }
-        return "That looks like math but I can't calculate it.";
-      }
-    }
-  ];
-
-  function processInput() {
-    const input = document.getElementById("inputBox").value;
-    let output = "No rule matched.";
-
-    for (const rule of rules) {
-      if (rule.match(input)) {
-        output = rule.action(input);
-        break;
-      }
-    }
-
-    document.getElementById("output").innerText = output;
+class RuleEngine {
+  constructor() {
+    this.straightRules = [];
+    this.codedRules = [];
   }
+
+  addStraight(trigger, response) {
+    this.straightRules.push({ trigger, response });
+  }
+
+  addCoded(matchFunction, actionFunction) {
+    this.codedRules.push({ match: matchFunction, action: actionFunction });
+  }
+
+  process(input) {
+    input = input.toLowerCase();
+
+    // 1️⃣ Straight rules
+    for (const rule of this.straightRules) {
+      if (input.includes(rule.trigger.toLowerCase())) {
+        return rule.response;
+      }
+    }
+
+    // 2️⃣ Coded rules
+    for (const rule of this.codedRules) {
+      if (rule.match(input)) {
+        return rule.action(input);
+      }
+    }
+
+    return "No rule matched.";
+  }
+}
+
+/* =========================
+   CREATE ENGINE INSTANCE
+========================= */
+
+const engine = new RuleEngine();
+
+/* =========================
+   ADD RULES HERE ONLY
+   (Safe to edit this section)
+========================= */
+
+// Straight rules (super easy)
+engine.addStraight("hello", "Hi there!");
+engine.addStraight("bye", "Goodbye!");
+engine.addStraight("no", "I'm sorry about that.");
+
+// Coded rules (advanced logic)
+engine.addCoded(
+  (input) => input.includes("+"),
+  (input) => {
+    const match = input.match(/(\d+)\s*\+\s*(\d+)/);
+    if (!match) return "That looks like math.";
+    return "Math result: " + (Number(match[1]) + Number(match[2]));
+  }
+);
+
+engine.addCoded(
+  (input) => input.startsWith("what is"),
+  () => "That sounds like a question."
+);
+
+/* =========================
+   CONNECT TO UI
+========================= */
+
+document.getElementById("runBtn").addEventListener("click", () => {
+  const input = document.getElementById("inputBox").value;
+  const result = engine.process(input);
+  document.getElementById("output").innerText = result;
+});
 </script>
+
+</body>
+</html>
